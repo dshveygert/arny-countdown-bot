@@ -1,0 +1,6 @@
+{
+  "telegram_bot": {
+    "name": "arny_countdown_bot",
+    "token": "[PASTE_TELEGRAM_BOT_TOKEN]"
+  }
+}
