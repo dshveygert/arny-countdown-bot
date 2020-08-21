@@ -27,20 +27,20 @@ function countdown(state = initialState, action: NewCtdnTypes) {
         case NEW_COUNTDOWN_CREATION_PROCESS_COMPLETED:
             const updateNew = {
                 ...state.newCountdownStartedList,
-                [action.payload]: {
+                [action.payload.id]: {
                     queue: EQueue.NOT_STARTED,
                     data: {}
                 }
             };
-            const updateList = state.countdownList[action.payload] ? {
+            const updateList = state.countdownList[action.payload.id] ? {
                 ...state.countdownList,
-                [action.payload]: [
-                    ...state.countdownList[action.payload],
-                    state.newCountdownStartedList[action.payload].data
-                ]
+                [action.payload.id]: {
+                    ...state.countdownList[action.payload.id],
+                    [action.payload.name]: state.newCountdownStartedList[action.payload.id].data
+                }
             } : {
                 ...state.countdownList,
-                [action.payload]: [state.newCountdownStartedList[action.payload].data]
+                [action.payload.id]: {[action.payload.name]: state.newCountdownStartedList[action.payload.id].data}
             }
             return {...state, newCountdownStartedList: updateNew, countdownList: updateList};
 

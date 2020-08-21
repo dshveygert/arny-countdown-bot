@@ -13,9 +13,6 @@ const bot = new TelegramBot(config.telegram_bot.token, {polling: true});
 bot.on("polling_error", (err: any) => err ? console.log(err) : console.log('No errors'));
 
 bot.onText(/\/start/, (msg: Message) => {
-    console.log('start', msg);
-
-    console.log('store 1', store.getState());
     bot.sendMessage(msg.chat.id, 'Lets start creating your new Countdown.', {
         reply_markup: {
             inline_keyboard: [newCountdownButton]
@@ -42,10 +39,12 @@ bot.on('callback_query', (callbackQuery) => {
 
         switch (actionModified) {
             case EActions.NEW_COUNTDOWN:
+                // @ts-ignore
                 store.dispatch(newCountdown(countdownOwnerId, EQueue.START, {}));
                 bot.sendMessage(msg.chat.id, 'Tape the Countdowns title (Your goal, dreams, event or task).');
                 break;
             case EActions.SET_YEAR:
+                // @ts-ignore
                 store.dispatch(newCountdown(countdownOwnerId, EQueue.YEAR, {year: Number(action?.replace('year_', ''))}));
                 bot.sendMessage(msg.chat.id, 'Set the Month:', {
                     reply_markup: {
@@ -56,6 +55,7 @@ bot.on('callback_query', (callbackQuery) => {
             case EActions.SET_MONTH:
                 const month = Number(action?.replace('month_', ''));
                 const year = store.getState().newCountdownStartedList[countdownOwnerId]?.data?.year;
+                // @ts-ignore
                 store.dispatch(newCountdown(countdownOwnerId, EQueue.MONTH, {month}));
                 bot.sendMessage(msg.chat.id, 'Set the Day:', {
                     reply_markup: {
@@ -64,6 +64,7 @@ bot.on('callback_query', (callbackQuery) => {
                 })
                 break;
             case EActions.SET_DAY:
+                // @ts-ignore
                 store.dispatch(newCountdown(countdownOwnerId, EQueue.DAY, {day: Number(action?.replace('day_', ''))}));
                 bot.sendMessage(msg.chat.id, 'Excellent! Countdown has been created. \nIt will remind you every day at 10:00 AM. \nIf you want to change time - write it in format *hh:mm*. If not - push the "Ok" button.', {parse_mode: 'HTML'}).then(_ => {
                     bot.sendMessage(msg.chat.id, 'Tape the time ( *hh:mm* ) or click "Ok".', {
@@ -75,9 +76,11 @@ bot.on('callback_query', (callbackQuery) => {
                 });
                 break;
             case EActions.COMPLETE_CREATION:
+                // @ts-ignore
                 store.dispatch(newCountdown(countdownOwnerId, EQueue.END, {}));
                 const title = store.getState().newCountdownStartedList[countdownOwnerId]?.data?.title;
                 bot.sendMessage(msg.chat.id, `Countdown "${title}" fully created.`);
+                // @ts-ignore
                 store.dispatch(newCountdownCreated(countdownOwnerId));
                 break;
             default:
@@ -98,8 +101,10 @@ bot.on('message', (msg) => {
         if (queue[nextPeriod] === EQueue.TITLE) {
             const data = {
                 [queue[nextPeriod]]: msg.text,
-                created: msg.date
+                created: msg.date,
+                ownerId: id
             };
+            // @ts-ignore
             store.dispatch(newCountdown(getId(msg), queue[nextPeriod] as EQueue, data));
             bot.sendMessage(msg.chat.id, 'Now it is necessary to set the date of your goal.').then(_ => {
                 bot.sendMessage(msg.chat.id, 'First, set the Year:', {

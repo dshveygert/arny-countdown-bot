@@ -6,11 +6,13 @@ export interface INewCtdnList {
 }
 
 export interface ICtdnList {
-    [chatId: string]: ICtdn[]
+    [chatId: string]: {
+        [key: string]: ICtdn
+    }
 }
 
 export interface ICtdn {
-    chatId: number,
+    ownerId: string,
     title: string,
     year: number,
     month: number,
