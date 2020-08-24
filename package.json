@@ -15,6 +15,7 @@
   "author": "SDV",
   "license": "ISC",
   "dependencies": {
+    "@types/axios": "^0.14.0",
     "@types/node": "^14.0.27",
     "@types/node-telegram-bot-api": "^0.50.2",
     "axios": "^0.19.2",

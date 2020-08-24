@@ -20,6 +20,12 @@ export enum EActions {
   COMPLETE_CREATION = 'complete_new_creation'
 }
 
+export enum EBotCommands {
+  START = '/start',
+  GET_LIST = '/list',
+  GET_LIST_COMPLETED = '/completed'
+}
+
 export interface IUid {
   user: number,
   chat: number | string
