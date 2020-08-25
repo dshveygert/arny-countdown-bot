@@ -29,7 +29,7 @@ export const getDaysButton = (n: number) => {
             result.push(rowArray);
             rowArray = [];
         }
-        rowArray.push({text: `${i + 1}`, callback_data: `day_0${i + 1}`});
+        rowArray.push({text: `${i + 1}`, callback_data: `day_${i <= 9 ? '0' : ''}${i + 1}`});
         if (i === n - 1) {
             result.push(rowArray);
         }

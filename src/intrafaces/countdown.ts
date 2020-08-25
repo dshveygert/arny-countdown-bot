@@ -16,13 +16,16 @@ export interface ICtdnItem {
 }
 
 export interface ICtdn {
+    id?: string,
     ownerId: IOwnerIDType,
     title: string,
     year: number,
     month: string,
     day: string,
     created: number | string,
-    time?: string
+    updated: number | string,
+    notification_time: string,
+    main_event: IOwnerIDType
 };
 
 export enum EQueue {

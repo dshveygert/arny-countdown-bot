@@ -99,7 +99,11 @@ bot.on('message', (msg) => {
             const data = {
                 [queue[nextStep]]: msg.text,
                 created: msg.date,
-                ownerId: countdownOwnerId
+                updated: msg.date,
+                notification_time: '10:00',
+                ownerId: countdownOwnerId,
+                complete: false,
+                main_event: '',
             };
             // @ts-ignore
             store.dispatch(newCountdown(getId(msg), queue[nextStep] as EQueue, data));
@@ -117,6 +121,13 @@ bot.on('message', (msg) => {
 
         switch (command) {
             case EBotCommands.START:
+                getCountdownList(countdownOwnerId).then(result => {
+                    if (result && Object.keys(result).length > 0) {
+                        const sorted = objectSort(result);
+                        // @ts-ignore
+                        store.dispatch(updateCountdownList(countdownOwnerId, sorted));
+                    }
+                });
                 bot.sendMessage(msg.chat.id, 'Lets start creating your new Countdown.', {
                     reply_markup: {
                         inline_keyboard: [newCountdownButton]
@@ -132,15 +143,13 @@ bot.on('message', (msg) => {
                         // @ts-ignore
                         store.dispatch(updateCountdownList(countdownOwnerId, sorted));
                         // console.log('[Final reducer]', JSON.stringify(store.getState()));
-                        let listString = '';
+                        let listString = 'List of your current Countdowns: \n';
                         for (let key in sorted) {
                             listString += countdownListString(sorted[key]) + '\n';
                         }
-                        bot.sendMessage(msg.chat.id, 'List of your current Countdowns:').then(_ => {
-                            bot.sendMessage(msg.chat.id, listString, {
-                                parse_mode: 'HTML'
-                            })
-                        });
+                        bot.sendMessage(msg.chat.id, listString, {
+                            parse_mode: 'HTML'
+                        })
                     }
                 })
                 break;
@@ -153,18 +162,21 @@ bot.on('message', (msg) => {
                         // @ts-ignore
                         store.dispatch(updateCountdownList(countdownOwnerId, sorted));
                         // console.log('[Final reducer]', JSON.stringify(store.getState()));
-                        let listString = '';
+                        let listString = 'List of your completed Countdowns: \n';
                         for (let key in sorted) {
                             listString += countdownListString(sorted[key]) + '\n';
                         }
-                        bot.sendMessage(msg.chat.id, 'List of your completed Countdowns:').then(_ => {
-                            bot.sendMessage(msg.chat.id, listString, {
-                                parse_mode: 'HTML'
-                            })
-                        });
+                        bot.sendMessage(msg.chat.id, listString, {
+                            parse_mode: 'HTML'
+                        })
                     }
                 })
                 break;
         }
     }
 });
+//
+// function intervalFunc() {
+//
+// }
+// setInterval(intervalFunc, config.tick_interval * 1000);

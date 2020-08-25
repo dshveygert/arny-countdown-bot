@@ -32,16 +32,17 @@ function countdown(state = initialState, action: NewCtdnTypes) {
                     data: {}
                 }
             };
+            const newCtdnData = {...state.newCountdownStartedList[action.payload.id].data, id: action.payload.name};
             const updateList = state.countdownList[action.payload.id] ? {
                 ...state.countdownList,
                 [action.payload.id]: {
                     ...state.countdownList[action.payload.id],
-                    [action.payload.name]: state.newCountdownStartedList[action.payload.id].data
+                    [action.payload.name]: newCtdnData
                 }
             } : {
                 ...state.countdownList,
-                [action.payload.id]: {[action.payload.name]: state.newCountdownStartedList[action.payload.id].data}
-            }
+                [action.payload.id]: {[action.payload.name]: newCtdnData}
+            };
             return {...state, newCountdownStartedList: updateNew, countdownList: updateList};
 
         case COUNTDOWN_LIST:
