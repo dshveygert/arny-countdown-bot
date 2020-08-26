@@ -21,7 +21,8 @@ class Scheduler {
         const event: ISchedule = {
             id,
             date: `${year}.${month}.${day}`,
-            time: {h: 7, m: 0, zone: '0'} // UTC = 7 AM, === 10 AM +3
+            time: {h: 7, m: 0, zone: '0'}, // UTC = 7 AM, === 10 AM +3
+            last_sended_date: Date.now()/1000
         };
         schedulerApi.postCountdownSchedule(ownerId, event);
     }
@@ -30,16 +31,16 @@ class Scheduler {
         const now = new Date();
         const tickTimeUTC = Math.floor(Date.now() / 1000);
         return this.getList().then(result => {
-            let remindersList: {ownerId:IOwnerIDType, id: string, countdown: number}[] = [];
+            let remindersList: {ownerId:IOwnerIDType, id: string, countdown: number, scheduleId: string}[] = [];
             if (result && (typeof result === 'object' && Object.keys(result).length > 0)) {
                 Object.keys(result).map(key => {
                     try {
                         // @ts-ignore
                         const scheduleList = result[key];
                         Object.keys(scheduleList).map(scheduleItem => {
-                            const userTime = this.getUserReminderTimeUTC(now, scheduleList[scheduleItem].time);
-                            if (this.compareTime(tickTimeUTC, userTime)) {
-                                remindersList.push({ownerId: key, id: scheduleList[scheduleItem].id, countdown: this.counter(tickTimeUTC, scheduleList[scheduleItem].date)});
+                            const userTimeForRemind = this.getUserReminderTimeUTC(now, scheduleList[scheduleItem].time);
+                            if (this.compareTime(tickTimeUTC, userTimeForRemind) && (!scheduleList[scheduleItem].last_sended_date || this.compareTime(tickTimeUTC, +scheduleList[scheduleItem].last_sended_date + 24 * 60 * 60))) {
+                                remindersList.push({ownerId: key, id: scheduleList[scheduleItem].id, countdown: this.counter(tickTimeUTC, scheduleList[scheduleItem].date), scheduleId: scheduleItem});
                             }
                         })
                     } catch (e) {
@@ -47,7 +48,8 @@ class Scheduler {
                     }
                 })
             } else {
-                console.log('Schedule is empty',);
+                console.log('Schedule is empty');
+                return new Promise(resolve => resolve('Schedule is empty'))
             }
 
             if (remindersList.length > 0) {
@@ -61,6 +63,7 @@ class Scheduler {
                     return reminder;
                 });
             } else {
+                console.log('No events to remind');
                 return new Promise(resolve => resolve('Empty'))
             }
         });

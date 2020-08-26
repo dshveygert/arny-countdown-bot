@@ -50,7 +50,7 @@ export interface ISchedule {
     id: string,
     time: ITime,
     date: string,
-    last_sended_date?: string
+    last_sended_date?: number
 }
 
 export interface ITime {

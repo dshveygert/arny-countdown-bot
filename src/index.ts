@@ -1,4 +1,4 @@
-import TelegramBot, {Message} from 'node-telegram-bot-api';
+import TelegramBot from 'node-telegram-bot-api';
 import {store} from './store/store';
 
 import * as config from "./config.json";
@@ -16,6 +16,7 @@ import {
 } from './utils/bot-tools';
 import {queue} from "./store/reducer";
 import {scheduler} from "./scheduler/scheduler";
+import {schedulerApi} from "./firebase/scheduler";
 
 const bot = new TelegramBot(config.telegram_bot.token, {polling: true});
 bot.on("polling_error", (err: any) => err ? console.log(err) : console.log('No errors'));
@@ -128,6 +129,7 @@ bot.on('message', (msg) => {
 
         switch (command) {
             case EBotCommands.START:
+            case EBotCommands.START + '@' + config.telegram_bot.name:
                 getCountdownList(countdownOwnerId).then(result => {
                     if (result && Object.keys(result).length > 0) {
                         const sorted = objectSortByDate(result);
@@ -142,6 +144,7 @@ bot.on('message', (msg) => {
                 });
                 break;
             case EBotCommands.GET_LIST:
+            case EBotCommands.GET_LIST + '@' + config.telegram_bot.name:
                 getCountdownList(countdownOwnerId).then(result => {
                     if (result && Object.keys(result).length === 0) {
                         bot.sendMessage(msg.chat.id, 'There are no Countdowns. Create new: /start');
@@ -161,6 +164,7 @@ bot.on('message', (msg) => {
                 })
                 break;
             case EBotCommands.GET_LIST_COMPLETED:
+            case EBotCommands.GET_LIST_COMPLETED + '@' + config.telegram_bot.name:
                 getCountdownList(countdownOwnerId, true).then(result => {
                     const sorted = objectSortByDate(result);
                     if (result && Object.keys(result).length === 0) {
@@ -186,10 +190,12 @@ bot.on('message', (msg) => {
 
 function intervalFunc() {
     scheduler.eventListTick().then(result => {
-        if (result && result.length > 0) {
+        console.log('result', result);
+        if (result && Array.isArray(result) && result.length > 0) {
             result.map((item: any) => {
                 const text = `${item.countdown} days to ${item.title}`;
                 bot.sendMessage(getChatId(item.ownerId), text);
+                schedulerApi.patchCountdownSchedule(item.ownerId, item.scheduleId, {last_sended_date: Date.now()/1000});
             })
 
         }

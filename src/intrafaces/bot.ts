@@ -1,3 +1,5 @@
+import * as config from "../config.json";
+
 import TelegramBot, {InlineKeyboardButton, Message} from "node-telegram-bot-api";
 
 export interface IMessage {

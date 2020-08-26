@@ -7,13 +7,13 @@ function getId(msg: Message | IUid): string {
     if (msg.hasOwnProperty('user')) {
         const chat = msg.chat ? msg.chat : 0;
         // @ts-ignore
-        return `${msg.user}_${chat < 0 ? Math.abs(chat) + '_G' : chat}`;
+        return `${msg.user}_${chat}${chat < 0 ? '_G' : ''}`;
     } else {
         // @ts-ignore
         const from = msg.from && msg.from.id ? msg.from.id : 'NoFromID';
         // @ts-ignore
         const chat = msg.chat && msg.chat.id ? msg.chat.id : 0;
-        return `${from}_${chat < 0 ? Math.abs(chat) + '_G' : chat}`;
+        return `${from}_${chat}${chat < 0 ? '_G' : ''}`;
     }
 }
 
