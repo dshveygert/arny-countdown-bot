@@ -6,8 +6,16 @@ import {monthButton, newCountdownButton, yearsButton, getDaysButton, completeBut
 import {EActions, EBotCommands} from "./intrafaces/bot";
 import {newCountdown, newCountdownCreated, updateCountdownList} from './store/actions';
 import {EQueue} from "./intrafaces/countdown";
-import {getId, getDaysInMonth, getCountdownList, countdownListString, objectSort} from './utils/bot-tools';
+import {
+    getId,
+    getDaysInMonth,
+    getCountdownList,
+    countdownListString,
+    objectSortByDate,
+    getChatId
+} from './utils/bot-tools';
 import {queue} from "./store/reducer";
+import {scheduler} from "./scheduler/scheduler";
 
 const bot = new TelegramBot(config.telegram_bot.token, {polling: true});
 bot.on("polling_error", (err: any) => err ? console.log(err) : console.log('No errors'));
@@ -48,7 +56,7 @@ bot.on('callback_query', (callbackQuery) => {
                 })
                 break;
             case EActions.SET_MONTH:
-                const month = action?.replace('month_', '') || '01';
+                const month = Number(action?.replace('month_', '')) || 1;
                 const year = store.getState().newCountdownStartedList[countdownOwnerId]?.data?.year;
                 // @ts-ignore
                 store.dispatch(newCountdown(countdownOwnerId, EQueue.MONTH, {month}));
@@ -60,9 +68,9 @@ bot.on('callback_query', (callbackQuery) => {
                 break;
             case EActions.SET_DAY:
                 // @ts-ignore
-                store.dispatch(newCountdown(countdownOwnerId, EQueue.DAY, {day: action?.replace('day_', '')}));
-                bot.sendMessage(msg.chat.id, 'Excellent! Countdown has been created. \nIt will remind you every day at 10:00 AM. \nIf you want to change time - write it in format *hh:mm*. If not - push the "Ok" button.', {parse_mode: 'HTML'}).then(_ => {
-                    bot.sendMessage(msg.chat.id, 'Tape the time ( *hh:mm* ) or click "Ok".', {
+                store.dispatch(newCountdown(countdownOwnerId, EQueue.DAY, {day: Number(action?.replace('day_', '')) | 1}));
+                bot.sendMessage(msg.chat.id, 'Excellent! Countdown has been created. \nIt will remind you every day at 10:00/+3. \nIf you want to change time - write it in format hh:mm/[Time-zone]. If not - push the "Ok" button.', {parse_mode: 'HTML'}).then(_ => {
+                    bot.sendMessage(msg.chat.id, 'Tape the time ( hh:mm/[Time-zone] ) or click "Ok".', {
                         reply_markup: {
                             inline_keyboard: completeButton
                         },
@@ -100,7 +108,6 @@ bot.on('message', (msg) => {
                 [queue[nextStep]]: msg.text,
                 created: msg.date,
                 updated: msg.date,
-                notification_time: '10:00',
                 ownerId: countdownOwnerId,
                 complete: false,
                 main_event: '',
@@ -123,7 +130,7 @@ bot.on('message', (msg) => {
             case EBotCommands.START:
                 getCountdownList(countdownOwnerId).then(result => {
                     if (result && Object.keys(result).length > 0) {
-                        const sorted = objectSort(result);
+                        const sorted = objectSortByDate(result);
                         // @ts-ignore
                         store.dispatch(updateCountdownList(countdownOwnerId, sorted));
                     }
@@ -139,7 +146,7 @@ bot.on('message', (msg) => {
                     if (result && Object.keys(result).length === 0) {
                         bot.sendMessage(msg.chat.id, 'There are no Countdowns. Create new: /start');
                     } else {
-                        const sorted = objectSort(result);
+                        const sorted = objectSortByDate(result);
                         // @ts-ignore
                         store.dispatch(updateCountdownList(countdownOwnerId, sorted));
                         // console.log('[Final reducer]', JSON.stringify(store.getState()));
@@ -155,7 +162,7 @@ bot.on('message', (msg) => {
                 break;
             case EBotCommands.GET_LIST_COMPLETED:
                 getCountdownList(countdownOwnerId, true).then(result => {
-                    const sorted = objectSort(result);
+                    const sorted = objectSortByDate(result);
                     if (result && Object.keys(result).length === 0) {
                         bot.sendMessage(msg.chat.id, 'There are no completed Countdowns.');
                     } else {
@@ -175,8 +182,17 @@ bot.on('message', (msg) => {
         }
     }
 });
-//
-// function intervalFunc() {
-//
-// }
-// setInterval(intervalFunc, config.tick_interval * 1000);
+
+
+function intervalFunc() {
+    scheduler.eventListTick().then(result => {
+        if (result && result.length > 0) {
+            result.map((item: any) => {
+                const text = `${item.countdown} days to ${item.title}`;
+                bot.sendMessage(getChatId(item.ownerId), text);
+            })
+
+        }
+    });
+}
+setInterval(intervalFunc, config.tick_interval * 1000);

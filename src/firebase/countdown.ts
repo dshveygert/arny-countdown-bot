@@ -11,12 +11,12 @@ class CountdownApi extends Api {
         return this.get(`/countdown/${id}.json`);
     }
 
-    postCountdown(id: string, data?: any) {
+    postCountdown(id: IOwnerIDType, data?: any) {
         return this.post(`/countdown/${id}.json`, data);
     }
 
-    patchCountdown(id: string, data?: any) {
-        return this.post(`/countdown/${id}.json`, data);
+    patchCountdown(id: IOwnerIDType, data?: any) {
+        return this.patch(`/countdown/${id}.json`, data);
     }
 }
 

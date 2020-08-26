@@ -7,18 +7,22 @@ function getId(msg: Message | IUid): string {
     if (msg.hasOwnProperty('user')) {
         const chat = msg.chat ? msg.chat : 0;
         // @ts-ignore
-        return `${msg.user}_${chat < 0 ? 'G_' + Math.abs(chat) : chat}`;
+        return `${msg.user}_${chat < 0 ? Math.abs(chat) + '_G' : chat}`;
     } else {
         // @ts-ignore
         const from = msg.from && msg.from.id ? msg.from.id : 'NoFromID';
         // @ts-ignore
         const chat = msg.chat && msg.chat.id ? msg.chat.id : 0;
-        return `${from}_${chat < 0 ? 'G_' + Math.abs(chat) : chat}`;
+        return `${from}_${chat < 0 ? Math.abs(chat) + '_G' : chat}`;
     }
 }
 
-function getDaysInMonth(month: string, year: number): number {
-    return new Date(year, Number(month), 0).getDate();
+function getChatId(ownerId: IOwnerIDType): number {
+    return Number(ownerId.split('_')[1]);
+}
+
+function getDaysInMonth(month: number, year: number): number {
+    return new Date(year, month, 0).getDate();
 }
 
 function objectFilter(obj: ICtdnItem, condition: (i: any) => {}): ICtdnItem {
@@ -31,9 +35,9 @@ function objectFilter(obj: ICtdnItem, condition: (i: any) => {}): ICtdnItem {
     return result;
 }
 
-function objectSort(obj: ICtdnItem): ICtdnItem {
+function objectSortByDate(obj: ICtdnItem): ICtdnItem {
     function sortF(a: ICtdn, b: ICtdn) {
-        return Number(`${a.year}${a.month}${a.day}`) - Number(`${b.year}${b.month}${b.day}`);
+        return Number(`${a.year}${a.month < 10 ? 0 : ''}${a.month}${a.day < 10 ? 0 : ''}${a.day}`) - Number(`${b.year}${b.month < 10 ? 0 : ''}${b.month}${b.day < 10 ? 0 : ''}${b.day}`);
     }
     const resultObj = {};
     // @ts-ignore
@@ -55,9 +59,10 @@ function countdownListString(countdown: ICtdn): string {
 
 export {
     getId,
+    getChatId,
     getDaysInMonth,
     objectFilter,
     getCountdownList,
     countdownListString,
-    objectSort
+    objectSortByDate
 }

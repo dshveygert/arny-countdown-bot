@@ -14,9 +14,9 @@ export const yearsButton = [[0,1,2,3,4,5].map(item => {
 })] as IInlineKeyboardButtonExtend[][];
 
 export const monthButton = [
-    [{text: 'January', callback_data: 'month_01'}, {text: 'February', callback_data: 'month_02'}, {text: 'March', callback_data: 'month_03'}],
-    [{text: 'April', callback_data: 'month_04'}, {text: 'May', callback_data: 'month_05'}, {text: 'June', callback_data: 'month_06'}],
-    [{text: 'July', callback_data: 'month_07'}, {text: 'August', callback_data: 'month_08'}, {text: 'September', callback_data: 'month_09'}],
+    [{text: 'January', callback_data: 'month_1'}, {text: 'February', callback_data: 'month_2'}, {text: 'March', callback_data: 'month_3'}],
+    [{text: 'April', callback_data: 'month_4'}, {text: 'May', callback_data: 'month_5'}, {text: 'June', callback_data: 'month_6'}],
+    [{text: 'July', callback_data: 'month_7'}, {text: 'August', callback_data: 'month_8'}, {text: 'September', callback_data: 'month_9'}],
     [{text: 'October', callback_data: 'month_10'}, {text: 'November', callback_data: 'month_11'}, {text: 'December', callback_data: 'month_12'}]
 ];
 
@@ -29,7 +29,7 @@ export const getDaysButton = (n: number) => {
             result.push(rowArray);
             rowArray = [];
         }
-        rowArray.push({text: `${i + 1}`, callback_data: `day_${i <= 9 ? '0' : ''}${i + 1}`});
+        rowArray.push({text: `${i + 1}`, callback_data: `day_${i + 1}`});
         if (i === n - 1) {
             result.push(rowArray);
         }

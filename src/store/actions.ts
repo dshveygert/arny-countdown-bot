@@ -1,6 +1,7 @@
 import { NEW_COUNTDOWN_CREATION_PROCESS, NEW_COUNTDOWN_CREATION_PROCESS_COMPLETED, COUNTDOWN_LIST } from "./action-types";
 import {EQueue, ICtdn, IOwnerIDType, ICtdnItem} from "../intrafaces/countdown";
 import {countdownApi} from "../firebase/countdown";
+import {scheduler} from "../scheduler/scheduler";
 
 interface NewCtdnCreation {
     type: typeof NEW_COUNTDOWN_CREATION_PROCESS
@@ -30,9 +31,13 @@ export function newCountdownCreated(ownerId: string) {
     // @ts-ignore
     return (dispatch, getState) => {
         const { newCountdownStartedList } = getState();
-        return countdownApi.postCountdown(ownerId, newCountdownStartedList[ownerId].data).then(result => {
-            dispatch({type: NEW_COUNTDOWN_CREATION_PROCESS_COMPLETED, payload: {id: ownerId, name: result?.data?.name}});
-        });
+        const countdown = newCountdownStartedList[ownerId].data;
+        return countdownApi.postCountdown(ownerId, countdown)
+            .then(result => {
+                const name = result?.data?.name;
+                dispatch({type: NEW_COUNTDOWN_CREATION_PROCESS_COMPLETED, payload: {id: ownerId, name}});
+                scheduler.newEvent(ownerId, name, countdown);
+            });
     }
 }
 

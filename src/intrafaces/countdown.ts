@@ -20,11 +20,10 @@ export interface ICtdn {
     ownerId: IOwnerIDType,
     title: string,
     year: number,
-    month: string,
-    day: string,
+    month: number,
+    day: number,
     created: number | string,
     updated: number | string,
-    notification_time: string,
     main_event: IOwnerIDType
 };
 
@@ -37,4 +36,25 @@ export enum EQueue {
     DAY = 'day',
     TIME = 'time',
     END = 'end'
+}
+
+export interface IScheduleList {
+    [ownerId: string]: IScheduleItem
+}
+
+export interface IScheduleItem {
+    [key: string]: ISchedule
+}
+
+export interface ISchedule {
+    id: string,
+    time: ITime,
+    date: string,
+    last_sended_date?: string
+}
+
+export interface ITime {
+    h: number,
+    m: number,
+    zone?: string
 }
