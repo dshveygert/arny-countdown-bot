@@ -22,6 +22,7 @@ export interface ICtdn {
     year: number,
     month: number,
     day: number,
+    time: string,
     created: number | string,
     updated: number | string,
     main_event: IOwnerIDType

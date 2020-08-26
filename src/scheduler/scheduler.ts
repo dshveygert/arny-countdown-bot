@@ -17,11 +17,20 @@ class Scheduler {
 
     private counter = (now: number, dateToCompare: string):number => Math.floor(((new Date(dateToCompare)).getTime()/1000 - now) / 60 /60 / 24);
 
-    public newEvent(ownerId: IOwnerIDType, id: string, { year, month, day }: ICtdn): void {
+    public newEvent(ownerId: IOwnerIDType, id: string, { year, month, day, time }: ICtdn): void {
+        let reminderTime: ITime = {h: 7, m: 0, zone: '0'};
+        if (time) {
+            const timeArr = time.split('/');
+            const hhmm = timeArr[0].split(':');
+            const zone = timeArr[1] && !!Number(timeArr[1]) ? timeArr[1] : reminderTime.zone;
+            const h = hhmm[0] && !!Number(hhmm[0]) ? Number(hhmm[0]) : reminderTime.h;
+            const m = hhmm[1] && !!Number(hhmm[1]) ? Number(hhmm[1]) : reminderTime.m;
+            reminderTime = {h, m, zone};
+        }
         const event: ISchedule = {
             id,
             date: `${year}.${month}.${day}`,
-            time: {h: 7, m: 0, zone: '0'}, // UTC = 7 AM, === 10 AM +3
+            time: reminderTime, // UTC = 7 AM, === 10 AM +3
             last_sended_date: Date.now()/1000
         };
         schedulerApi.postCountdownSchedule(ownerId, event);
