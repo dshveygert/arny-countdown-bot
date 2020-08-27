@@ -3,9 +3,9 @@ import {store} from './store/store';
 
 import * as config from "./config.json";
 import {monthButton, newCountdownButton, yearsButton, getDaysButton, completeButton} from "./utils/buttons";
-import {EActions, EBotCommands} from "./intrafaces/bot";
+import {EActions, EBotCommands} from "./interfaces/bot";
 import {newCountdown, newCountdownCreated, updateCountdownList} from './store/actions';
-import {EQueue, IOwnerIDType} from "./intrafaces/countdown";
+import {EQueue, IOwnerIDType} from "./interfaces/countdown";
 import {
     getId,
     getDaysInMonth,

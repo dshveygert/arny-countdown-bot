@@ -1,6 +1,6 @@
-import { IUid } from "../intrafaces/bot";
+import { IUid } from "../interfaces/bot";
 import { Message } from "node-telegram-bot-api";
-import {ICtdn, ICtdnItem, IOwnerIDType} from "../intrafaces/countdown";
+import {ICtdn, ICtdnItem, IOwnerIDType} from "../interfaces/countdown";
 import {countdownApi} from "../firebase/countdown";
 
 function getId(msg: Message | IUid): string {

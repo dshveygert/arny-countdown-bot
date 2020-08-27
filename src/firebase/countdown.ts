@@ -1,5 +1,5 @@
 import { Api } from './api';
-import {ICtdnList, IOwnerIDType} from "../intrafaces/countdown";
+import {ICtdnList, IOwnerIDType} from "../interfaces/countdown";
 import {AxiosResponse} from "axios";
 
 class CountdownApi extends Api {

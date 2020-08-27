@@ -7,7 +7,8 @@
     "start": "nodemon public/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "tsc && node public/index.js",
-    "dev": "./node_modules/nodemon/bin/nodemon.js -e ts  --exec \"npm run compile\""
+    "dev": "./node_modules/nodemon/bin/nodemon.js -e ts  --exec \"npm run compile\"",
+    "build": "tsc"
   },
   "keywords": [
     "countdown"

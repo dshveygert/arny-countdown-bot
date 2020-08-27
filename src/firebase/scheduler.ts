@@ -1,5 +1,5 @@
 import { Api } from './api';
-import { IOwnerIDType, ISchedule } from "../intrafaces/countdown";
+import { IOwnerIDType, ISchedule } from "../interfaces/countdown";
 
 class SchedulerApi extends Api {
 

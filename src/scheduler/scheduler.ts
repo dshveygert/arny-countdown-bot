@@ -1,4 +1,4 @@
-import { ICtdn, IOwnerIDType, ISchedule, IScheduleList, ITime } from "../intrafaces/countdown";
+import { ICtdn, IOwnerIDType, ISchedule, IScheduleList, ITime } from "../interfaces/countdown";
 import { schedulerApi } from "../firebase/scheduler";
 import { AxiosResponse } from "axios";
 import {countdownApi} from "../firebase/countdown";

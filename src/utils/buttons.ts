@@ -1,5 +1,5 @@
 import {InlineKeyboardButton} from "node-telegram-bot-api";
-import {EActions} from "../intrafaces/bot";
+import {EActions} from "../interfaces/bot";
 
 interface IInlineKeyboardButtonExtend extends InlineKeyboardButton {
     type: string;

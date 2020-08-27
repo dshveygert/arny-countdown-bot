@@ -1,5 +1,5 @@
 import {COUNTDOWN_LIST, NEW_COUNTDOWN_CREATION_PROCESS, NEW_COUNTDOWN_CREATION_PROCESS_COMPLETED} from "./action-types";
-import {EQueue, ICtdnList, INewCtdnList} from "../intrafaces/countdown";
+import {EQueue, ICtdnList, INewCtdnList} from "../interfaces/countdown";
 import {NewCtdnTypes} from "./actions";
 
 const queue = [EQueue.START, EQueue.TITLE, EQueue.YEAR, EQueue.MONTH, EQueue.DAY, EQueue.TIME, EQueue.END];

@@ -1,5 +1,5 @@
 import { NEW_COUNTDOWN_CREATION_PROCESS, NEW_COUNTDOWN_CREATION_PROCESS_COMPLETED, COUNTDOWN_LIST } from "./action-types";
-import {EQueue, ICtdn, IOwnerIDType, ICtdnItem} from "../intrafaces/countdown";
+import {EQueue, ICtdn, IOwnerIDType, ICtdnItem} from "../interfaces/countdown";
 import {countdownApi} from "../firebase/countdown";
 import {scheduler} from "../scheduler/scheduler";
 

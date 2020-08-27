@@ -1,5 +1,5 @@
 import * as config from "../config.json";
-import {ICtdn, ICtdnItem, IScheduleItem, IOwnerIDType} from "../intrafaces/countdown";
+import {ICtdn, ICtdnItem, IScheduleItem, IOwnerIDType} from "../interfaces/countdown";
 import {schedulerApi} from "../firebase/scheduler";
 import {countdownApi} from "../firebase/countdown";
 
