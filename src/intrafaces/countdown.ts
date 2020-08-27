@@ -25,7 +25,8 @@ export interface ICtdn {
     time: string,
     created: number | string,
     updated: number | string,
-    main_event: IOwnerIDType
+    main_event: IOwnerIDType,
+    complete: boolean
 };
 
 export enum EQueue {

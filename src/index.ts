@@ -17,6 +17,7 @@ import {
 import {queue} from "./store/reducer";
 import {scheduler} from "./scheduler/scheduler";
 import {schedulerApi} from "./firebase/scheduler";
+import {terminator} from "./scheduler/terminator";
 
 const bot = new TelegramBot(config.telegram_bot.token, {polling: true});
 bot.on("polling_error", (err: any) => err ? console.log(err) : console.log('No errors'));
@@ -229,4 +230,5 @@ function intervalFunc(): void {
         }
     });
 }
-setInterval(intervalFunc, config.tick_interval * 1000);
+setInterval(intervalFunc, config.tick_interval_sec * 1000);
+setInterval(terminator.completeOldEvents, config.period_to_compare_sec * 1000);

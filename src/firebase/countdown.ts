@@ -1,9 +1,10 @@
 import { Api } from './api';
-import { IOwnerIDType } from "../intrafaces/countdown";
+import {ICtdnList, IOwnerIDType} from "../intrafaces/countdown";
+import {AxiosResponse} from "axios";
 
 class CountdownApi extends Api {
 
-    public getList() {
+    public getList(): Promise<AxiosResponse<ICtdnList>> {
         return this.get('/countdown.json');
     }
 
@@ -15,8 +16,8 @@ class CountdownApi extends Api {
         return this.post(`/countdown/${id}.json`, data);
     }
 
-    patchCountdown(id: IOwnerIDType, data?: any) {
-        return this.patch(`/countdown/${id}.json`, data);
+    patchCountdown(id: IOwnerIDType, eventId: string, data?: any) {
+        return this.patch(`/countdown/${id}/${eventId}.json`, data);
     }
 }
 

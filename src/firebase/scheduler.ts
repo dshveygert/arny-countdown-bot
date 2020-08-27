@@ -14,6 +14,10 @@ class SchedulerApi extends Api {
     patchCountdownSchedule(id: IOwnerIDType, scheduleId: string, data?: Partial<ISchedule>) {
         return this.patch(`/schedule/${id}/${scheduleId}.json`, data);
     }
+
+    deleteScheduleItem(id: IOwnerIDType, scheduleId: string) {
+        return this.delete(`/schedule/${id}/${scheduleId}.json`);
+    }
 }
 
 export const schedulerApi = new SchedulerApi();

@@ -6,5 +6,6 @@
   "firebase": {
     "db_url": "https://[YOUR_PROJECT_NAME].firebaseio.com/"
   },
-  "tick_interval": 600
+  "tick_interval_sec": 900,
+  "period_to_compare_sec": 43200
 }

@@ -60,6 +60,14 @@ export class Api {
       data: payload
     });
   }
+
+  public delete(path: string) {
+    return this.axiosInstance.request({
+      method: 'DELETE',
+      url: `${this.apiUrl}${path}`,
+      responseType: 'json'
+    });
+  }
 }
 
 export const api = new Api();
