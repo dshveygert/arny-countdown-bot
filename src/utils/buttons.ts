@@ -37,4 +37,4 @@ export const getDaysButton = (n: number) => {
     return result as InlineKeyboardButton[][];
 };
 
-export const completeButton = [[{text: 'Ok', callback_data: 'complete_new_creation'}]];
+export const completeButton = [[{text: 'Finish creation', callback_data: 'complete_new_creation'}]];

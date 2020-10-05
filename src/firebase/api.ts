@@ -3,6 +3,7 @@ import * as config from '../config.json';
 
 export class Api {
   private axiosInstance: AxiosInstance;
+  // private authIsAuthorised: () => boolean;
   constructor() {
     const header = {
       headers: {
@@ -32,42 +33,44 @@ export class Api {
   };
 
   private static log(error?: AxiosError) {
-    return console.log('\n\n [Error interceptor] \n\n', error);
+    return console.log('\n\n [Error interceptor] \n\n', error?.response?.status, error?.response?.config);
   }
 
   get apiUrl() {
     return config.firebase.db_url;
   }
 
-  public get(path: string, params?: AxiosRequestConfig) {
-    return this.axiosInstance.get(`${this.apiUrl}${path}`, params);
+  get apiAuthUrl() {
+    return config.firebase.auth_url;
   }
 
-  public post(path: string, payload: any) {
+  public get(path: string, params?: AxiosRequestConfig, url = this.apiUrl) {
+    return this.axiosInstance.get(`${url}${path}`, params);
+  }
+
+  public post(path: string, payload: any, url = this.apiUrl) {
     return this.axiosInstance.request({
       method: 'POST',
-      url: `${this.apiUrl}${path}`,
+      url: `${url}${path}`,
       responseType: 'json',
       data: payload
     });
   }
 
-  public patch(path: string, payload: any) {
+  public patch(path: string, payload: any, url = this.apiUrl) {
     return this.axiosInstance.request({
       method: 'PATCH',
-      url: `${this.apiUrl}${path}`,
+      url: `${url}${path}`,
       responseType: 'json',
       data: payload
     });
   }
 
-  public delete(path: string) {
+  public delete(path: string, url = this.apiUrl) {
     return this.axiosInstance.request({
       method: 'DELETE',
-      url: `${this.apiUrl}${path}`,
+      url: `${url}${path}`,
       responseType: 'json'
     });
   }
 }
-
-export const api = new Api();

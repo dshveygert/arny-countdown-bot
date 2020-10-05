@@ -4,7 +4,12 @@
     "token": "[PASTE_TELEGRAM_BOT_TOKEN]"
   },
   "firebase": {
-    "db_url": "https://[YOUR_PROJECT_NAME].firebaseio.com/"
+    "db_url": "https://[YOUR_PROJECT_NAME].firebaseio.com/",
+    "auth_url": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword",
+    "api_key": "[API_KEY]",
+    "user_email": "[FIREBASE_USER_NAME]",
+    "password": "[FIREBASE_USER_PASSWORD]",
+    "user_id": "[FIREBASE_USER_ID]"
   },
   "tick_interval_sec": 900,
   "period_to_compare_sec": 43200

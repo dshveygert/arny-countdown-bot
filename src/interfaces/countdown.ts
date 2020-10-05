@@ -16,7 +16,6 @@ export interface ICtdnItem {
 }
 
 export interface ICtdn {
-    id?: string,
     ownerId: IOwnerIDType,
     title: string,
     year: number,
@@ -27,6 +26,9 @@ export interface ICtdn {
     updated: number | string,
     main_event: IOwnerIDType,
     complete: boolean
+    id?: string,
+    updated_date_time?: string,
+    created_date_time?: string,
 };
 
 export enum EQueue {
@@ -52,7 +54,8 @@ export interface ISchedule {
     id: string,
     time: ITime,
     date: string,
-    last_sended_date?: number
+    last_sended_date?: number,
+    last_Sended_date_time?: string
 }
 
 export interface ITime {

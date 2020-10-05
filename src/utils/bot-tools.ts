@@ -1,7 +1,7 @@
 import { IUid } from "../interfaces/bot";
 import { Message } from "node-telegram-bot-api";
 import {ICtdn, ICtdnItem, IOwnerIDType} from "../interfaces/countdown";
-import {countdownApi} from "../firebase/countdown";
+import {countdownApi} from "../firebase/countdownApi";
 
 function getId(msg: Message | IUid): string {
     if (msg.hasOwnProperty('user')) {
@@ -23,6 +23,11 @@ function getChatId(ownerId: IOwnerIDType): number {
 
 function getDaysInMonth(month: number, year: number): number {
     return new Date(year, month, 0).getDate();
+}
+
+function getDateTime(now: number): string {
+    const dateTime = new Date(now);
+    return `${dateTime.toDateString()} ${dateTime.toTimeString()}`;
 }
 
 function objectFilter(obj: ICtdnItem, condition: (i: any) => {}): ICtdnItem {
@@ -64,5 +69,6 @@ export {
     objectFilter,
     getCountdownList,
     countdownListString,
-    objectSortByDate
+    objectSortByDate,
+    getDateTime
 }

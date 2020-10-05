@@ -1,6 +1,6 @@
 {
   "name": "arny-countown-bot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Arny Countdown Telegram Bot",
   "main": "./public/index.js",
   "scripts": {

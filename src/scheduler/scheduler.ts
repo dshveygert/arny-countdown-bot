@@ -1,7 +1,7 @@
 import { ICtdn, IOwnerIDType, ISchedule, IScheduleList, ITime } from "../interfaces/countdown";
-import { schedulerApi } from "../firebase/scheduler";
+import { schedulerApi } from "../firebase/schedulerApi";
 import { AxiosResponse } from "axios";
-import {countdownApi} from "../firebase/countdown";
+import {countdownApi} from "../firebase/countdownApi";
 
 class Scheduler {
     private getCurrentDate = (date: Date): string => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;

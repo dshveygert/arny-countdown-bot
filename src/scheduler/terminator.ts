@@ -1,7 +1,8 @@
 import * as config from "../config.json";
 import {ICtdn, ICtdnItem, IScheduleItem, IOwnerIDType} from "../interfaces/countdown";
-import {schedulerApi} from "../firebase/scheduler";
-import {countdownApi} from "../firebase/countdown";
+import {schedulerApi} from "../firebase/schedulerApi";
+import {countdownApi} from "../firebase/countdownApi";
+import {getDateTime} from "../utils/bot-tools";
 
 interface IScheduleToDelete {
     ownerId: IOwnerIDType,
@@ -71,10 +72,11 @@ class Terminator {
             const listToComplete = await this.getListToComplete(now) || [];
             if (listToComplete.length > 0) {
                 const schedulesToDelete = await this.getSchedulesToDelete(listToComplete) || [];
+                console.log('schedulesToDelete', schedulesToDelete);
                 listToComplete.map((item: ICtdnItem) => {
                     const eventId = Object.keys(item)[0];
                     const ownerId = item[eventId].ownerId;
-                    countdownApi.patchCountdown(ownerId, eventId, {complete: true, updated: now});
+                    countdownApi.patchCountdown(ownerId, eventId, {complete: true, updated: now, updated_date_time: getDateTime(now * 1000)});
                 });
                 schedulesToDelete.map((item: IScheduleToDelete) => {
                     schedulerApi.deleteScheduleItem(item.ownerId, item.scheduleId);

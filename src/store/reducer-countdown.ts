@@ -8,7 +8,7 @@ const initialState = {
     countdownList: {} as ICtdnList
 };
 
-function countdown(state = initialState, action: NewCtdnTypes) {
+function countdownReducer(state = initialState, action: NewCtdnTypes) {
     switch (action.type) {
         case NEW_COUNTDOWN_CREATION_PROCESS:
             const update = {
@@ -59,6 +59,6 @@ function countdown(state = initialState, action: NewCtdnTypes) {
 }
 
 export {
-    countdown,
+    countdownReducer,
     queue
 }

@@ -4,27 +4,27 @@ import {store} from './store/store';
 import * as config from "./config.json";
 import {monthButton, newCountdownButton, yearsButton, getDaysButton, completeButton} from "./utils/buttons";
 import {EActions, EBotCommands} from "./interfaces/bot";
-import {newCountdown, newCountdownCreated, updateCountdownList} from './store/actions';
-import {EQueue, IOwnerIDType} from "./interfaces/countdown";
+import {auth, newCountdown, newCountdownCreated, updateCountdownList} from './store/actions';
+import {EQueue, INewCtdnList, IOwnerIDType} from "./interfaces/countdown";
 import {
     getId,
     getDaysInMonth,
     getCountdownList,
     countdownListString,
     objectSortByDate,
-    getChatId
+    getChatId, getDateTime
 } from './utils/bot-tools';
-import {queue} from "./store/reducer";
+import {queue} from "./store/reducer-countdown";
 import {scheduler} from "./scheduler/scheduler";
-import {schedulerApi} from "./firebase/scheduler";
+import {schedulerApi} from "./firebase/schedulerApi";
 import {terminator} from "./scheduler/terminator";
+import { getAuthorisationParams } from './firebase/auth';
 
 const bot = new TelegramBot(config.telegram_bot.token, {polling: true});
 bot.on("polling_error", (err: any) => err ? console.log(err) : console.log('No errors'));
 
-bot.on('poll_answer', rr => {
-    console.log('rr', rr);
-})
+// @ts-ignore
+store.dispatch(auth(getAuthorisationParams()));
 
 // Handle callback queries
 bot.on('callback_query', (callbackQuery) => {
@@ -59,7 +59,8 @@ bot.on('callback_query', (callbackQuery) => {
                 break;
             case EActions.SET_MONTH:
                 const month = Number(action?.replace('month_', '')) || 1;
-                const year = store.getState().newCountdownStartedList[countdownOwnerId]?.data?.year;
+                const { newCountdownStartedList = {} as INewCtdnList } = store.getState().countdown;
+                const year = newCountdownStartedList[countdownOwnerId]?.data?.year;
                 // @ts-ignore
                 store.dispatch(newCountdown(countdownOwnerId, EQueue.MONTH, {month}));
                 bot.sendMessage(msg.chat.id, 'Set the Day:', {
@@ -71,8 +72,8 @@ bot.on('callback_query', (callbackQuery) => {
             case EActions.SET_DAY:
                 // @ts-ignore
                 store.dispatch(newCountdown(countdownOwnerId, EQueue.DAY, {day: Number(action?.replace('day_', '')) | 1}));
-                bot.sendMessage(msg.chat.id, 'Excellent! \nIt will remind you every day at 10:00/+3. \nOr you can change time - write it in format hh:mm/[Time-zone]. If not - push the "Ok" button.', {parse_mode: 'HTML'}).then(_ => {
-                    bot.sendMessage(msg.chat.id, 'Tape the time ( hh:mm/[Time-zone] ) or click "Ok".', {
+                bot.sendMessage(msg.chat.id, 'Excellent! \nSet the time, or it will remind you every day at 10:00/+3. Write it in format hh:mm/[Time-zone]. If not - push the "Finish creation" button.', {parse_mode: 'HTML'}).then(_ => {
+                    bot.sendMessage(msg.chat.id, 'Tape the time ( hh:mm/[Time-zone] ) or click "Finish creation".', {
                         reply_markup: {
                             inline_keyboard: completeButton
                         },
@@ -81,13 +82,6 @@ bot.on('callback_query', (callbackQuery) => {
                 });
                 break;
             case EActions.COMPLETE_CREATION:
-                // // @ts-ignore
-                // store.dispatch(newCountdown(countdownOwnerId, EQueue.END, {}));
-                // const title = store.getState().newCountdownStartedList[countdownOwnerId]?.data?.title;
-                // bot.sendMessage(msg.chat.id, `Countdown "${title}" fully created.`);
-                // // @ts-ignore
-                // store.dispatch(newCountdownCreated(countdownOwnerId));
-
                 completeCreation(countdownOwnerId, msg.chat.id);
                 break;
 
@@ -103,7 +97,7 @@ bot.on('callback_query', (callbackQuery) => {
 
 bot.on('message', (msg) => {
     console.log('[Message type detected]', msg);
-    const { newCountdownStartedList } = store.getState();
+    const { newCountdownStartedList = {} as INewCtdnList } = store.getState().countdown;
     const countdownOwnerId = getId(msg);
     if (newCountdownStartedList.hasOwnProperty(countdownOwnerId)) {
         const nextStep = queue.indexOf(newCountdownStartedList[countdownOwnerId].queue) + 1;
@@ -111,7 +105,9 @@ bot.on('message', (msg) => {
             const data = {
                 [queue[nextStep]]: msg.text,
                 created: msg.date,
+                created_date_time: getDateTime(msg.date * 1000),
                 updated: msg.date,
+                updated_date_time: getDateTime(msg.date * 1000),
                 ownerId: countdownOwnerId,
                 complete: false,
                 main_event: '',
@@ -127,22 +123,12 @@ bot.on('message', (msg) => {
             });
         }
         if (queue[nextStep] === EQueue.TIME) {
-            console.log('?>?>?>?>?', nextStep, queue[nextStep]);
             const data = {
                 [queue[nextStep]]: msg.text
             };
             // @ts-ignore
             store.dispatch(newCountdown(getId(msg), queue[nextStep] as EQueue, data));
-            console.log('\n \n store After Actions', JSON.stringify(store.getState()));
-            console.log('\n\n');
             completeCreation(countdownOwnerId, msg.chat.id);
-            // bot.sendMessage(msg.chat.id, 'Now it is necessary to set the date of your goal.').then(_ => {
-            //     bot.sendMessage(msg.chat.id, 'First, set the Year:', {
-            //         reply_markup: {
-            //             inline_keyboard: yearsButton
-            //         }
-            //     })
-            // });
         }
     }
     if (msg && msg.entities && msg.entities[0].type === 'bot_command') {
@@ -211,24 +197,28 @@ bot.on('message', (msg) => {
 function completeCreation(countdownOwnerId: IOwnerIDType, chatId: number): void {
     // @ts-ignore
     store.dispatch(newCountdown(countdownOwnerId, EQueue.END, {}));
-    const title = store.getState().newCountdownStartedList[countdownOwnerId]?.data?.title;
+    const { newCountdownStartedList = {} as INewCtdnList } = store.getState().countdown;
+    const title = newCountdownStartedList[countdownOwnerId]?.data?.title;
     bot.sendMessage(chatId, `Countdown "${title}" fully created.`);
     // @ts-ignore
-    store.dispatch(newCountdownCreated(countdownOwnerId));
+    store.dispatch(newCountdownCreated(countdownOwnerId, newCountdownStartedList[countdownOwnerId]?.data));
 }
 
-function intervalFunc(): void {
+function intervalReminder(): void {
     scheduler.eventListTick().then(result => {
         console.log('result', result);
         if (result && Array.isArray(result) && result.length > 0) {
             result.map((item: any) => {
                 const text = `${item.countdown} days to "${item.title}"`;
                 bot.sendMessage(getChatId(item.ownerId), text);
-                schedulerApi.patchCountdownSchedule(item.ownerId, item.scheduleId, {last_sended_date: Date.now()/1000});
+                schedulerApi.patchCountdownSchedule(item.ownerId, item.scheduleId, {
+                    last_sended_date: Date.now()/1000,
+                    last_Sended_date_time: getDateTime(Date.now())
+                });
             })
 
         }
     });
 }
-setInterval(intervalFunc, config.tick_interval_sec * 1000);
+setInterval(intervalReminder, config.tick_interval_sec * 1000);
 setInterval(terminator.completeOldEvents, config.period_to_compare_sec * 1000);
